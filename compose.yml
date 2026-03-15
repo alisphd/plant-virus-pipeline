@@ -1,0 +1,13 @@
+services:
+  plant-virus-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      PVP_RUNTIME_DIR: /data
+      PVP_ALLOW_REAL_RUNS: "false"
+      PORT: "8000"
+    volumes:
+      - ./runtime:/data

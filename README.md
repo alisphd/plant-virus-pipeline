@@ -6,9 +6,11 @@ Plant Virus Pipeline is a command-line workflow for screening paired-end plant s
 The repository now includes:
 
 - a Python CLI entrypoint that orchestrates the workflow end-to-end,
+- a lightweight web service for submitting and tracking runs,
 - hardened shell helpers for the preprocessing steps,
 - tiny demo inputs for smoke testing,
-- Markdown and JSON reports that summarize each run.
+- Markdown and JSON reports that summarize each run,
+- Docker and GitHub Actions files for deployment.
 
 ## What The Pipeline Does
 
@@ -23,6 +25,7 @@ The intended workflow is:
 ## Repository Layout
 
 - `plant_virus_pipeline/`: Python package and CLI entrypoint
+- `docs/`: deployment notes
 - `scripts/`: standalone shell helpers for QC and host removal
 - `data/`: tiny demo inputs for smoke tests
 - `envs/`: Conda environment definition
@@ -80,6 +83,52 @@ python -m plant_virus_pipeline check \
 python -m plant_virus_pipeline report --output results/sample_01
 ```
 
+### Start The Web Service
+
+```bash
+python -m plant_virus_pipeline serve --host 0.0.0.0 --port 8000
+```
+
+Then open `http://localhost:8000`.
+
+## Docker Deployment
+
+Build the container:
+
+```bash
+docker build -t plant-virus-pipeline .
+```
+
+Run the web service:
+
+```bash
+docker run --rm -p 8000:8000 -v $(pwd)/runtime:/data \
+  -e PVP_RUNTIME_DIR=/data \
+  -e PVP_ALLOW_REAL_RUNS=false \
+  plant-virus-pipeline
+```
+
+Or use Compose:
+
+```bash
+docker compose up --build
+```
+
+## Web API
+
+The web layer exposes:
+
+- `GET /healthz`: health check
+- `GET /api/environment`: tool availability and runtime settings
+- `POST /api/jobs`: submit a pipeline job via file upload
+- `GET /api/jobs`: list recent jobs
+- `GET /api/jobs/{job_id}`: fetch job status
+- `GET /api/jobs/{job_id}/report`: fetch report JSON when available
+
+## CI
+
+GitHub Actions now runs the unit test suite on pushes and pull requests. A separate workflow can publish a container image to GitHub Container Registry on demand or on release.
+
 ## Output Structure
 
 Each run creates a directory like:
@@ -105,10 +154,16 @@ The `05_report/` folder contains:
 - Host removal is optional, but recommended when a host reference is available.
 - BLAST and Kraken2 classification are optional independently, but at least one should be supplied for real virus screening.
 - Windows users will usually have the smoothest experience through Conda plus a POSIX-compatible shell, WSL, or Docker.
+- The bundled web service stores jobs on the local filesystem. For public production deployments, add authentication, object storage, and a separate worker queue.
+- Classification databases are not bundled into the repo or image. Mount them at runtime and pass their paths in the web form or CLI.
 
 ## Run The Tests
 
 ```bash
 python -m unittest discover -s tests
 ```
+
+## Deployment Notes
+
+Deployment details and platform considerations are in `docs/DEPLOYMENT.md`.
 

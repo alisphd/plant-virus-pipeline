@@ -1,0 +1,8 @@
+.git
+.github
+.tmp-tests
+__pycache__
+*.pyc
+results
+runtime
+manual-test-dir

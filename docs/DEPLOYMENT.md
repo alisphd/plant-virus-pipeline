@@ -4,7 +4,7 @@ This repository can now be deployed as a small web service that accepts paired-e
 
 ## What Is Included
 
-- `Dockerfile`: builds a container with the Conda toolchain and web service
+- `Dockerfile`: builds a lightweight web-service container for Railway and similar hosts
 - `compose.yml`: local container orchestration for the web service
 - `.github/workflows/ci.yml`: Python test workflow
 - `.github/workflows/publish-container.yml`: optional container publish workflow for GHCR
@@ -37,6 +37,8 @@ To allow non-dry-run execution:
 2. ensure the image or host contains the required bioinformatics tools
 3. mount or provision BLAST and Kraken2 databases if you plan to use them
 4. mount persistent storage for `/data`
+
+The default hosted Docker image in this repo does not bundle the full bioinformatics stack. It is optimized for getting the web service online successfully on Railway. For real analysis runs, use a heavier compute image or a separate worker environment.
 
 ## Production Considerations
 

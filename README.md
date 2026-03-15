@@ -126,6 +126,12 @@ Recommended Railway setup:
 4. Set `PVP_ALLOW_REAL_RUNS=false` for the first deploy.
 5. Set `PVP_RUNTIME_DIR=/data` if you want to override the automatic Railway volume detection.
 
+Important:
+
+- The default Railway image is intentionally lightweight so it can build reliably.
+- That hosted version is for the web UI, job tracking, and dry-run/demo mode first.
+- Real bioinformatics execution still requires a heavier toolchain and external databases.
+
 After deploy, open:
 
 - `/healthz`

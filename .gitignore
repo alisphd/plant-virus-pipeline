@@ -8,3 +8,5 @@ build/
 results/
 .tmp-tests/
 manual-test-dir/
+runtime/
+.pip-tmp/

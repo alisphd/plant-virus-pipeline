@@ -87,6 +87,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Pipeline output directory.",
     )
 
+    serve_parser = subparsers.add_parser("serve", help="Run the web service.")
+    serve_parser.add_argument("--host", default="127.0.0.1", help="Host interface to bind.")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind.")
+    serve_parser.add_argument(
+        "--reload",
+        action="store_true",
+        help="Enable auto-reload for local development.",
+    )
+
     return parser
 
 
@@ -170,6 +179,22 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        if args.command == "serve":
+            try:
+                import uvicorn
+            except ImportError as exc:
+                raise PipelineError(
+                    "uvicorn is required for the web service. Install the project dependencies first."
+                ) from exc
+
+            uvicorn.run(
+                "plant_virus_pipeline.web:app",
+                host=args.host,
+                port=args.port,
+                reload=args.reload,
+            )
+            return 0
+
         if args.command == "report":
             summary_json, summary_md = write_report(args.output)
             print(f"Wrote {summary_json}")

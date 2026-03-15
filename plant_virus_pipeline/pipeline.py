@@ -37,6 +37,28 @@ class PipelineConfig:
                 data[key] = str(value)
         return data
 
+    @classmethod
+    def from_mapping(cls, payload: dict[str, object]) -> "PipelineConfig":
+        return cls(
+            reads1=Path(str(payload["reads1"])),
+            reads2=Path(str(payload["reads2"])),
+            output=Path(str(payload["output"])),
+            host_reference=Path(str(payload["host_reference"]))
+            if payload.get("host_reference")
+            else None,
+            blast_db=str(payload["blast_db"]) if payload.get("blast_db") else None,
+            kraken_db=Path(str(payload["kraken_db"])) if payload.get("kraken_db") else None,
+            threads=int(payload.get("threads", 4)),
+            dry_run=bool(payload.get("dry_run", False)),
+            resume=bool(payload.get("resume", False)),
+            skip_fastqc=bool(payload.get("skip_fastqc", False)),
+            skip_host_removal=bool(payload.get("skip_host_removal", False)),
+            skip_assembly=bool(payload.get("skip_assembly", False)),
+            skip_blast=bool(payload.get("skip_blast", False)),
+            skip_kraken=bool(payload.get("skip_kraken", False)),
+            keep_sam=bool(payload.get("keep_sam", False)),
+        )
+
 
 def load_config_file(path: Path) -> dict[str, object]:
     with path.open("r", encoding="utf-8") as handle:

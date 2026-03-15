@@ -11,10 +11,20 @@ requires-python = ">=3.10"
 authors = [
   { name = "Project Contributors" }
 ]
-dependencies = []
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn[standard]>=0.30,<1.0",
+  "python-multipart>=0.0.9,<1.0",
+]
 
 [project.scripts]
 plant-virus-pipeline = "plant_virus_pipeline.cli:main"
+plant-virus-web = "plant_virus_pipeline.web:main"
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.27,<1.0",
+]
 
 [tool.setuptools.packages.find]
 include = ["plant_virus_pipeline*"]

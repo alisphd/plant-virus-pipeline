@@ -114,6 +114,23 @@ Or use Compose:
 docker compose up --build
 ```
 
+## Railway Deployment
+
+This repo now includes a `railway.json` file for Docker-based deployment on Railway.
+
+Recommended Railway setup:
+
+1. Create a new Railway project from this GitHub repo.
+2. Keep the Dockerfile deployment mode.
+3. Add a volume and mount it at `/data`.
+4. Set `PVP_ALLOW_REAL_RUNS=false` for the first deploy.
+5. Set `PVP_RUNTIME_DIR=/data` if you want to override the automatic Railway volume detection.
+
+After deploy, open:
+
+- `/healthz`
+- `/api/environment`
+
 ## Web API
 
 The web layer exposes:

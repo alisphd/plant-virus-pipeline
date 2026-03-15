@@ -329,7 +329,15 @@ def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
 def create_app(
     runtime_dir: Path | None = None, allow_real_runs: bool | None = None
 ) -> FastAPI:
-    resolved_runtime = (runtime_dir or Path(os.getenv("PVP_RUNTIME_DIR", "runtime"))).resolve()
+    runtime_root = (
+        runtime_dir
+        or Path(
+            os.getenv("PVP_RUNTIME_DIR")
+            or os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+            or "runtime"
+        )
+    )
+    resolved_runtime = runtime_root.resolve()
     resolved_allow_real_runs = (
         allow_real_runs
         if allow_real_runs is not None

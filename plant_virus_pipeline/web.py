@@ -92,7 +92,33 @@ def _job_record(
 
 
 def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
-    checked = "" if allow_real_runs else "checked"
+    mode_badge = (
+        '<div class="badge badge-accent">Mode: <code>full-run enabled</code></div>'
+        if allow_real_runs
+        else '<div class="badge badge-accent">Mode: <code>demo only</code></div>'
+    )
+    notice_html = (
+        """
+      <section class="notice">
+        <strong>Full pipeline mode</strong>
+        This deployment is allowed to run real pipeline jobs if the required tools and databases are installed on the server.
+      </section>
+"""
+        if allow_real_runs
+        else """
+      <section class="notice">
+        <strong>Demo mode</strong>
+        This public website is online for learning, testing uploads, and showing the workflow. It does not currently run the full virus-detection toolchain on the server.
+      </section>
+"""
+    )
+    dry_run_control = (
+        '<label class="checkbox"><input name="dry_run" type="checkbox" value="true">Dry run</label>'
+        if allow_real_runs
+        else '<input name="dry_run" type="hidden" value="true"><p class="helper">This hosted version only accepts dry-run jobs, so the demo mode setting is locked on.</p>'
+    )
+    submit_title = "Submit Pipeline Job" if allow_real_runs else "Submit Demo Job"
+    submit_button = "Create Job" if allow_real_runs else "Create Demo Job"
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -151,10 +177,33 @@ def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
       border-radius: 999px;
       font-size: 0.95rem;
     }}
+    .badge-accent {{
+      background: #e6f2ec;
+      border-color: #bfd8cc;
+    }}
+    .notice {{
+      margin-bottom: 22px;
+      border: 1px solid #d4c3a5;
+      background: linear-gradient(135deg, #fff3df, #f9f0e5);
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 30px rgba(98, 73, 39, 0.06);
+    }}
+    .notice strong {{
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }}
     .grid {{
       display: grid;
       gap: 18px;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }}
+    .grid-tight {{
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-bottom: 18px;
     }}
     .card {{
       background: var(--card);
@@ -215,6 +264,27 @@ def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
       color: var(--muted);
       font-size: 0.95rem;
     }}
+    .helper {{
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }}
+    .list {{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }}
+    .kicker {{
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }}
     code {{
       background: #eef3ef;
       padding: 2px 6px;
@@ -228,14 +298,50 @@ def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
       <div class="badge-row">
         <div class="badge">Runtime: <code>{runtime_dir}</code></div>
         <div class="badge">Real runs enabled: <code>{str(allow_real_runs).lower()}</code></div>
+        {mode_badge}
       </div>
       <h1>Plant Virus Pipeline</h1>
-      <p>Upload paired-end reads, create a job, and track the output of the pipeline from your browser. This deployment stores uploads and reports on the local filesystem.</p>
+      <p>This project is a research-oriented workflow for screening plant sequencing files for possible viruses. The website lets you upload files, create a job, and read the resulting report in plain language.</p>
+    </section>
+
+    {notice_html}
+
+    <section class="grid-tight">
+      <div class="card">
+        <p class="kicker">What This Is</p>
+        <h2>Beginner Summary</h2>
+        <ul class="list">
+          <li>A browser front end for a plant-virus screening workflow.</li>
+          <li>Designed for paired-end sequencing files, usually called R1 and R2.</li>
+          <li>Useful for testing uploads, job creation, and report generation.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <p class="kicker">What This Is Not</p>
+        <h2>Important Limits</h2>
+        <ul class="list">
+          <li>Not a medical or agricultural diagnosis service.</li>
+          <li>Not a complete public bioinformatics platform yet.</li>
+          <li>Not a full live virus-detection server in this demo deployment.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <p class="kicker">How To Read It</p>
+        <h2>What Users Should Expect</h2>
+        <ul class="list">
+          <li>If you upload files here, you will get a job record and report output.</li>
+          <li>In demo mode, the report shows the planned workflow rather than a true biological result.</li>
+          <li>Advanced database fields can be ignored by most beginners.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="grid">
       <div class="card">
-        <h2>Submit Job</h2>
+        <h2>{submit_title}</h2>
+        <p class="helper">For beginners: R1 and R2 are the two matching sequencing files from the same sample. If you do not know what BLAST or Kraken2 mean, you can leave those advanced fields empty.</p>
         <form id="job-form">
           <label for="reads1">Reads R1</label>
           <input id="reads1" name="reads1" type="file" required>
@@ -255,8 +361,8 @@ def _render_home(runtime_dir: Path, allow_real_runs: bool) -> str:
           <label for="threads">Threads</label>
           <input id="threads" name="threads" type="number" value="4" min="1">
 
-          <label class="checkbox"><input name="dry_run" type="checkbox" value="true" {checked}>Dry run</label>
-          <button type="submit">Create Job</button>
+          {dry_run_control}
+          <button type="submit">{submit_button}</button>
         </form>
         <p id="submit-status" class="muted"></p>
       </div>

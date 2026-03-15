@@ -3,6 +3,37 @@
 
 Plant Virus Pipeline is a command-line workflow for screening paired-end plant sequencing reads for possible viral content.
 
+## Plain-English Summary
+
+In simple terms, this project is trying to answer:
+
+"If I upload sequencing files from a plant sample, can this workflow help me check whether any virus-like sequences might be present?"
+
+The project has two parts:
+
+- a research pipeline for processing sequencing files
+- a small website for uploading files, starting jobs, and viewing reports
+
+## What The Live Website Can Do Today
+
+- accept paired-end sequencing files through a browser
+- create a job record and store uploaded files
+- show the steps the pipeline would run
+- generate a report for dry-run and demo submissions
+
+## What The Live Website Does Not Do Yet
+
+- it is not a medical diagnosis tool
+- it is not a crop-health certification tool
+- it is not yet a full public bioinformatics service with the heavy virus-detection software installed on the hosted server
+- it does not currently give a true production-grade virus identification result on the public demo deployment
+
+## Who This Is For
+
+- students learning what a sequencing pipeline looks like
+- researchers testing the workflow structure
+- collaborators who want to understand the project without running code locally
+
 The repository now includes:
 
 - a Python CLI entrypoint that orchestrates the workflow end-to-end,

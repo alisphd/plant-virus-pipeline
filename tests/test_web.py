@@ -45,6 +45,8 @@ class WebTests(unittest.TestCase):
             home = client.get("/")
             self.assertEqual(home.status_code, 200)
             self.assertIn("Plant Virus Pipeline", home.text)
+            self.assertIn("Demo mode", home.text)
+            self.assertIn("What This Is Not", home.text)
         finally:
             if runtime_dir.exists():
                 shutil.rmtree(runtime_dir)
